@@ -1,0 +1,1989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Reben</title>
+    <link rel="icon" type="image/png" href="logo2.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <style>
+        /* =========================================
+            1. CORE VARIABLES & SETUP
+            ========================================= */
+        :root {
+            --primary: #ff0f39; 
+            --primary-dark: #b30022;
+            --dark-bg: #0f172a;
+            --glass-white: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --text-main: #1e293b;
+            --text-light: #64748b;
+            --shadow-3d: 
+                0 13px 27px -5px rgba(50,50,93,0.25), 
+                0 8px 16px -8px rgba(0,0,0,0.3);
+            --shadow-glow: 0 0 20px rgba(255, 15, 57, 0.3);
+            --curve: 20px;
+            --whatsapp-green: #25d366;
+            --whatsapp-dark: #128c7e;
+            --whatsapp-light: #dcf8c6;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #f0f2f5;
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Animated Mesh Background (GPU Optimized) */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(at 0% 0%, rgba(255, 15, 57, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(23, 23, 100, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(255, 15, 57, 0.05) 0px, transparent 50%);
+            z-index: -1;
+            transform: translateZ(0);
+        }
+
+        /* =========================================
+            2. HEADER (Radius Reduced)
+            ========================================= */
+        .header-wrapper {
+            position: sticky;
+            top: 20px;
+            z-index: 1000;
+            padding: 0 20px;
+            margin-bottom: 40px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            max-width: 1600px;
+            width: 96%;
+            margin: 0 auto;
+            border-radius: 12px; 
+            padding: 15px 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s ease;
+            position: relative; 
+            overflow: hidden; 
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-logo img {
+            max-height: 60px;
+        }
+
+        /* =========================================
+            3. TICKER (Radius Reduced)
+            ========================================= */
+        .ticker-container {
+            max-width: 1600px;
+            width: 96%;
+            margin: 0 auto 40px;
+            padding: 0 20px;
+        }
+
+        .news-ticker-bar {
+            background: var(--dark-bg);
+            color: white;
+            height: 46px;
+            border-radius: 10px; 
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: var(--shadow-3d);
+            position: relative;
+        }
+
+        .ticker-badge {
+            background: var(--primary);
+            color: white;
+            padding: 0 25px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            z-index: 2;
+            border-radius: 10px; 
+            box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+        }
+        
+        .news-ticker-bar .ticker-badge {
+            border-radius: 10px 0 0 10px; 
+        }
+
+        .ticker-wrapper {
+            flex: 1;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .ticker-content {
+            display: inline-block;
+            animation: scrollText linear infinite;
+            padding-right: 0;
+            will-change: transform;
+        }
+
+        .ticker-item {
+            display: inline-block;
+            margin: 0 30px;
+            font-size: 0.9rem;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        
+        .ticker-item i { color: var(--primary); margin-right: 8px; }
+
+        @keyframes scrollText {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* =========================================
+            4. SLIDER
+            ========================================= */
+        .slider-container {
+            max-width: 1600px;
+            width: 96%;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .slider-frame {
+            width: 100%;
+            height: 550px;
+            border-radius: 24px; 
+            overflow: hidden;
+            position: relative;
+            box-shadow: var(--shadow-3d);
+            transform: translateZ(0);
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transform: scale(1.1);
+            transition: opacity 1s ease-in-out, transform 8s ease;
+            will-change: opacity, transform;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1);
+            z-index: 1;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.85);
+        }
+
+        .slide-content {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            z-index: 2;
+            max-width: 600px;
+        }
+
+        .slide-content h2 {
+            font-size: 3rem;
+            color: white;
+            line-height: 1.1;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transform: translateY(30px);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s;
+        }
+
+        .slide.active .slide-content h2 {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .dots-container {
+            position: absolute;
+            bottom: 25px;
+            right: 40px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .dot.active {
+            background: var(--primary);
+            transform: scale(1.3);
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        /* =========================================
+            5. GRID SECTION (The Core Logic)
+            ========================================= */
+        .grid-section {
+            max-width: 1600px;
+            width: 96%;
+            margin: 0 auto 40px;
+            padding: 0;
+        }
+        
+        .grid-padding-wrapper {
+            padding: 0 20px;
+        }
+
+        .section-header {
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--text-main), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .grid-row { 
+            display: flex;
+            overflow-x: auto;
+            gap: 25px;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+            padding-left: 20px;
+            padding-right: 20px;
+            -webkit-overflow-scrolling: touch; 
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .grid-row::-webkit-scrollbar { display: none; }
+
+        .card {
+            min-width: calc(50% - 15px);
+            flex: 0 0 auto;
+            background: white;
+            border-radius: 20px;
+            height: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            position: relative;
+            transition: transform 0.3s ease-out, box-shadow 0.3s ease-out; 
+            border: 1px solid rgba(0,0,0,0.03);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            overflow: hidden;
+            z-index: 1;
+            will-change: transform; 
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-3d);
+            border-color: rgba(255, 15, 57, 0.2);
+            z-index: 10;
+        }
+
+        .card-icon-box {
+            width: 60px;
+            height: 60px;
+            background: #fff5f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            transition: transform 0.4s ease-out;
+            color: var(--primary);
+            font-size: 1.6rem;
+        }
+
+        .card:hover .card-icon-box {
+            background: var(--primary);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .card span {
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            text-align: center;
+            padding: 0 10px;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(255,15,57,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            transition: transform 0.5s ease-out;
+        }
+
+        .card:hover::before { transform: scale(5); }
+
+        /* =========================================
+            6. DATA ENTRY & SEARCH SECTION
+            ========================================= */
+        .data-entry-container {
+            max-width: 1400px;
+            width: 96%;
+            margin: 0 auto 80px;
+            padding: 0 20px;
+        }
+
+        .data-entry-top {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .custom-select, .custom-btn {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .custom-select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+            padding-right: 40px;
+            cursor: pointer;
+            color: #1e293b;
+        }
+
+        .custom-btn {
+            text-align: center;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1e293b;
+            cursor: pointer;
+        }
+
+        .border-red { border: 1.5px solid var(--primary); }
+        .border-grey { border: 1.5px solid #e2e8f0; }
+        
+        .custom-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 15, 57, 0.1);
+        }
+
+        .custom-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(255,15,57,0.1);
+            background: #fff5f6;
+        }
+
+        .search-db-btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1.5px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .search-db-btn i {
+            font-size: 1.2rem;
+        }
+
+        .search-db-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(255,15,57,0.2);
+        }
+
+        /* =========================================
+            7. CONTACT & EXTRAS
+            ========================================= */
+        .contact-section {
+            max-width: 1400px;
+            width: 96%;
+            margin: 0 auto 80px;
+            padding: 0 20px;
+        }
+
+        .contact-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow-3d);
+            display: grid;
+            grid-template-columns: 1.2fr 2fr;
+        }
+
+        .contact-visual {
+            background: linear-gradient(135deg, var(--primary) 0%, #8f001b 100%);
+            padding: 40px;
+            color: white;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .contact-links {
+            padding: 40px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .c-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+            transition: transform 0.2s ease;
+        }
+        .c-item:hover { transform: translateX(5px); }
+
+        .c-icon {
+            width: 50px;
+            height: 50px;
+            background: #fff5f6;
+            color: var(--primary);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .c-detail h4 { font-size: 0.9rem; color: var(--text-light); font-weight: 500; }
+        .c-detail div { font-size: 1rem; color: var(--text-main); font-weight: 700; }
+
+        .app-downloads {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 60px;
+            flex-wrap: wrap;
+        }
+        .app-downloads img {
+            height: 55px;
+            transition: transform 0.3s;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .app-downloads img:hover { transform: translateY(-5px); }
+
+        /* =========================================
+            8. ULTIMATE EYE-CATCHING WHATSAPP ICON
+            ========================================= */
+        .whatsapp-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+
+        .whatsapp-float {
+            position: relative;
+            width: 75px;
+            height: 75px;
+            background: linear-gradient(135deg, var(--whatsapp-green) 0%, var(--whatsapp-dark) 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            box-shadow: 
+                0 20px 40px rgba(37, 211, 102, 0.5),
+                0 0 0 15px rgba(37, 211, 102, 0.15),
+                0 0 0 30px rgba(37, 211, 102, 0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+            text-decoration: none;
+            overflow: hidden;
+            animation: floatBounce 3s ease-in-out infinite, glowPulse 2s ease-in-out infinite;
+        }
+
+        /* Floating bounce animation */
+        @keyframes floatBounce {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            30% {
+                transform: translateY(-15px) rotate(8deg);
+            }
+            60% {
+                transform: translateY(-5px) rotate(-4deg);
+            }
+        }
+
+        /* Glow pulse animation */
+        @keyframes glowPulse {
+            0%, 100% {
+                box-shadow: 
+                    0 20px 40px rgba(37, 211, 102, 0.5),
+                    0 0 0 15px rgba(37, 211, 102, 0.15),
+                    0 0 0 30px rgba(37, 211, 102, 0.08);
+            }
+            50% {
+                box-shadow: 
+                    0 25px 50px rgba(37, 211, 102, 0.7),
+                    0 0 0 20px rgba(37, 211, 102, 0.2),
+                    0 0 0 40px rgba(37, 211, 102, 0.1);
+            }
+        }
+
+        /* Rotating ring effect */
+        .whatsapp-float::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: conic-gradient(
+                transparent,
+                var(--whatsapp-green),
+                var(--whatsapp-light),
+                var(--whatsapp-dark),
+                transparent
+            );
+            border-radius: 50%;
+            animation: spinRing 3s linear infinite;
+            z-index: -1;
+            opacity: 0.8;
+        }
+
+        @keyframes spinRing {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Inner glow effect */
+        .whatsapp-float::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: innerPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes innerPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        /* WhatsApp icon styling */
+        .whatsapp-float i {
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        @keyframes badgeJump {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        @keyframes badgeShake {
+            0%, 100% {
+                transform: rotate(0deg);
+            }
+            25% {
+                transform: rotate(-5deg);
+            }
+            75% {
+                transform: rotate(5deg);
+            }
+        }
+
+        /* Floating text label */
+        .whatsapp-label {
+            position: absolute;
+            bottom: 85px;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .whatsapp-label::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            right: 20px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid rgba(0, 0, 0, 0.8);
+        }
+
+        /* Hover effects */
+        .whatsapp-container:hover .whatsapp-float {
+            transform: scale(1.2) rotate(20deg);
+            animation-play-state: paused;
+            box-shadow: 
+                0 30px 60px rgba(37, 211, 102, 0.8),
+                0 0 0 25px rgba(37, 211, 102, 0.25),
+                0 0 0 50px rgba(37, 211, 102, 0.12);
+        }
+
+        .whatsapp-container:hover .whatsapp-label {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .whatsapp-container:hover .whatsapp-badge {
+            animation: badgeExplode 0.5s forwards;
+        }
+
+        @keyframes badgeExplode {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.5);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Click effect */
+        .whatsapp-float:active {
+            transform: scale(0.9);
+            transition: transform 0.1s;
+        }
+
+        /* Particle effects container */
+        .particles-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        footer {
+            background: var(--dark-bg);
+            color: rgba(255,255,255,0.5);
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: auto;
+            border-radius: 15px 15px 0 0; 
+            position: relative; 
+            overflow: hidden; 
+        }
+
+        /* =========================================
+            9. MOVING ACCENT LINES EFFECT (4-SIDED)
+            ========================================= */
+
+        @keyframes rotate-border {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .accent-border {
+            position: relative; 
+            overflow: hidden; 
+            border: none !important;
+            box-shadow: var(--shadow-3d); 
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .accent-border::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            z-index: -1; 
+            background: conic-gradient(
+                transparent 0deg, 
+                transparent 100deg, 
+                var(--primary) 120deg, 
+                var(--primary-dark) 180deg, 
+                var(--primary) 240deg, 
+                transparent 260deg, 
+                transparent 360deg
+            );
+            animation: rotate-border 4s linear infinite; 
+            will-change: transform;
+        }
+        
+        .accent-border::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            z-index: 0;
+            background: inherit; 
+            border-radius: inherit;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        footer.accent-border::after {
+            background: var(--dark-bg);
+            backdrop-filter: none;
+        }
+        
+        .header *, footer * {
+            z-index: 1;
+            position: relative;
+        }
+
+        /* =========================================
+            10. RESPONSIVENESS
+            ========================================= */
+        @media (min-width: 769px) {
+            .grid-row { 
+                display: grid;
+                grid-template-columns: repeat(4, 1fr); 
+                overflow-x: auto;
+                padding: 0;
+                margin-bottom: 25px;
+            }
+            .card { min-width: auto; }
+        }
+
+        @media (max-width: 768px) {
+            .slider-frame { height: 280px; }
+            .header { padding: 10px 20px; border-radius: 12px; } 
+            .header-logo img { max-height: 45px; }
+            .contact-card { grid-template-columns: 1fr; }
+            .contact-visual { text-align: center; padding: 30px; }
+            .contact-links { grid-template-columns: 1fr; }
+            
+            .ticker-updates-text {
+                display: none;
+            }
+            .news-ticker-bar .ticker-badge {
+                padding: 0 15px;
+            }
+            
+            .data-entry-top {
+                grid-template-columns: 1fr;
+            }
+            
+            /* WhatsApp mobile adjustments */
+            .whatsapp-container {
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .whatsapp-float {
+                width: 65px;
+                height: 65px;
+                font-size: 32px;
+                animation: floatBounce 4s ease-in-out infinite, glowPulse 3s ease-in-out infinite;
+            }
+            
+            .whatsapp-badge {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+                top: -5px;
+                right: -5px;
+            }
+            
+            .whatsapp-label {
+                font-size: 12px;
+                padding: 6px 12px;
+                bottom: 75px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .whatsapp-container {
+                bottom: 15px;
+                right: 15px;
+            }
+            
+            .whatsapp-float {
+                width: 60px;
+                height: 60px;
+                font-size: 28px;
+            }
+            
+            .whatsapp-badge {
+                width: 24px;
+                height: 24px;
+                font-size: 10px;
+            }
+        }
+
+        /* =========================================
+            11. MODAL POPUP & NEW BUTTON STYLES
+            ========================================= */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(5px);
+            z-index: 2000; display: none; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content {
+            background: white; width: 90%; max-width: 600px; border-radius: 20px;
+            padding: 30px; position: relative; box-shadow: var(--shadow-3d);
+            transform: translateY(20px); transition: transform 0.3s ease;
+            max-height: 80vh; overflow-y: auto;
+        }
+        .modal-content {
+            padding-bottom: 80px;
+        }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+        .modal-close {
+            position: absolute; top: 20px; right: 20px; background: #fff5f6;
+            color: var(--primary); border: none; width: 35px; height: 35px;
+            border-radius: 50%; font-size: 1.2rem; cursor: pointer;
+            display: flex; justify-content: center; align-items: center; transition: 0.3s;
+        }
+        .modal-close:hover { background: var(--primary); color: white; transform: rotate(90deg); }
+        .modal-header { margin-bottom: 20px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px;}
+        .modal-header h3 { color: var(--text-main); font-size: 1.5rem; }
+        .result-item {
+            background: #f8fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+        }
+        .result-item p { margin-bottom: 5px; font-size: 0.95rem; }
+        .result-item strong { color: var(--text-main); }
+        .loader {
+            border: 4px solid #f3f3f3; border-top: 4px solid var(--primary);
+            border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Action Buttons specific styling */
+        .modal-action-btns {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f2f5;
+        }
+        .action-icon-btn {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-main);
+        }
+        .action-icon-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .action-icon-btn#btn-print:hover { color: #3b82f6; border-color: #3b82f6; } 
+        .action-icon-btn#btn-excel:hover { color: #107c41; border-color: #107c41; } 
+        .action-icon-btn#btn-pdf:hover { color: #e20613; border-color: #e20613; } 
+        .action-icon-btn.wa-btn {
+            color: #25d366;
+            border-color: #25d366;
+            background: #f0fdf4;
+        }
+        .action-icon-btn.wa-btn:hover {
+            background: #25d366;
+            color: white;
+        }
+
+        /* Print Specific Styling */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #resultsModal, #resultsModal * {
+                visibility: visible;
+            }
+            #resultsModal {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background: white;
+                align-items: flex-start;
+                padding: 0;
+            }
+            .modal-content {
+                box-shadow: none;
+                width: 100%;
+                max-width: 100%;
+                transform: none;
+                overflow: visible;
+                height: auto;
+                max-height: none;
+            }
+            .modal-action-btns, .modal-close {
+                display: none !important;
+            }
+            .modal-navigation-buttons {
+                display: none !important;
+            }
+        }
+
+        /* Single dynamic arrow - hidden by default, shown only when needed */
+        .modal-navigation-buttons {
+            position: sticky;
+            bottom: 15px;
+            display: flex;
+            justify-content: flex-end;
+            pointer-events: auto;
+            margin-top: 15px;
+            z-index: 15;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.2s, opacity 0.2s;
+        }
+        .modal-navigation-buttons.visible {
+            visibility: visible;
+            opacity: 1;
+        }
+        .nav-arrow {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+            color: var(--primary);
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .nav-arrow:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+        /* Custom styling for the top source tab name in results */
+        .source-tab-label {
+            display: block;
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            border-bottom: 1px dashed rgba(255, 15, 57, 0.2);
+            padding-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    
+    <audio id="backgroundMusic" loop>
+        <source src="your-music-file.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="header-wrapper">
+        <header class="header vibrate-and-play-link accent-border"> 
+            <div class="header-logo">
+                <img src="company-logo.png" alt="Reben">
+            </div>
+        </header>
+    </div>
+
+    <div class="ticker-container">
+        <div class="news-ticker-bar vibrate-and-play-link">
+            <div class="ticker-badge">LIVE <span class="ticker-updates-text">‎‎ UPDATES</span></div>
+            <div class="ticker-wrapper">
+                <div class="ticker-content" id="ticker-content">
+                    <div class="ticker-item"><i class="fas fa-bolt"></i> Welcome to Reben-Live Updates.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slider-container">
+        <div class="slider-frame">
+            <div class="slide active">
+                <img src="image-1.jpg" alt="Office">
+                <div class="slide-content">
+                    <h2>Welcome to<br>Reben</h2>
+                </div>
+            </div>
+            <div class="slide"><img src="image-2.jpg" alt="Slide 2"></div>
+            <div class="slide"><img src="image-3.jpg" alt="Slide 3"></div>
+            
+            <div class="dots-container">
+                <div class="dot active vibrate-and-play-link" data-index="0"></div> 
+                <div class="dot vibrate-and-play-link" data-index="1"></div>
+                <div class="dot vibrate-and-play-link" data-index="2"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-section">
+        <div class="grid-padding-wrapper">
+            <div class="section-header">
+                <h2 class="section-title">Quick Access</h2>
+                <div style="height: 2px; flex: 1; background: linear-gradient(90deg, var(--primary), transparent); opacity: 0.3;"></div>
+            </div>
+        </div>
+        
+        <div class="grid-row">
+            <a href="https://docs.google.com/spreadsheets/d/1k-2trbMhyzRm9Ch6f1Ex3UU8_riJ9wMWNxomofKOGPA/edit?usp=sharing" target="_blank" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-cubes"></i></div>
+                <span>Stations Stock & Sale</span>
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/1ywvL0IrfBlFkVCSew4JjIHuKGTfuAck15OMTJCkCh-U/edit?usp=sharing" target="_blank" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-chart-pie"></i></div>
+                <span>February Stock & Sale Report</span>
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/1kJ4RV3nQ-IThH1N_AIIS1S5s5TjqK4YlAdChR_kWLwM/edit?usp=sharing" target="_blank" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-clipboard-list"></i></div>
+                <span>Daily Stocks</span>
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/1SbvKdOLDfTXtm40zdmh_M6cqOKKoVFCXSyCXyOwDAx8/edit?usp=sharing" target="_blank" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-search-location"></i></div>
+                <span>Station Inspections</span>
+            </a>
+        </div>
+
+        <div class="grid-row">
+            <a href="https://docs.google.com/spreadsheets/d/1jKWKJ4oWsMNH-9qHyDEhUTCrA5CDNAQU9HAbTjOaTr0/edit?usp=sharing" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-headset"></i></div>
+                <span>Trips Report</span>
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/1aoAcpQe3gbg3viwZHFvykgAKS1A_PgjgLp2sq8skEMY/edit?usp=sharing" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-calendar-check"></i></div>
+                <span>Truck Maintenance</span>
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/1tN3qOIfCXI-DZGJdh4Dl6uTmK-5_Iji_XVJNiYKtwYI/edit?usp=sharing" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-book-reader"></i></div>
+                <span>Truck Inspection</span>
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/1z9w1XyoiPpSMSnSfBDB-3WLahjXv8Lu16ZtcqhOM7iQ/edit?usp=sharing" class="card vibrate-and-play-link" target="_blank">
+    <div class="card-icon-box"><i class="fas fa-bullhorn"></i></div>
+    <span>Company Vehicle Reports</span>
+</a>
+        </div>
+        
+        <div class="grid-row">
+            <a href="https://docs.google.com/spreadsheets/d/1-rC8WxLB2YSByIX6ErgDQkDTzLG8xx_I9KTUHXt-A2c/edit?usp=sharing" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-envelope-open-text"></i></div>
+                <span>Monthly Sales Report</span>
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/1rD64arA84ApL7lisOXo_ITlQ6OuFgrNQ_QZafiv9Gqg/edit?usp=sharing" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-truck"></i></div>
+                <span>Transportation Fee</span>
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/1enpYJsfSpg7HvI1m6-xJNMJU2xUDKM9w/edit?usp=sharing&ouid=105527693019117548372&rtpof=true&sd=true" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-code-branch"></i></div>
+                <span>Truck Monthly Odo Meter</span>
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/1PkSsc4Aznig3z8D96pf8W9FeOf3p-IEf/edit?usp=sharing&ouid=105527693019117548372&rtpof=true&sd=true" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-project-diagram"></i></div>
+                <span>Daily Truck Refueling</span>
+            </a>
+        </div>
+        
+        <div class="grid-row">
+            <a href="https://drive.google.com/file/d/1YbGXNJEzw5jkP01YljEMTjWzOXKS78k-/view?usp=sharing" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-users-cog"></i></div>
+                <span>Stations List</span>
+            </a>
+            <a href="https://mozahidreben.github.io/test2/" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-calculator"></i></div>
+                <span>Calculator</span>
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/1yZKE2AUHxrsDnWn7ES33fhEOMhf6kOFqulYXM7VfzIA/edit?usp=sharing" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-server"></i></div>
+                <span>Reben Marketing</span>
+                
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/1TOAr2tIAhNoiyeqVFbOgtt7U_rwjcmbQt5FB1lvYA2c/edit?usp=sharing" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-database"></i></div>
+                <span>January Stock</span>
+            </a>
+        </div>
+
+        <div class="grid-row">
+        <a href="https://chatgpt.com/" target="_blank" class="card vibrate-and-play-link">
+        <div class="card-icon-box">
+            <img
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/ChatGPT-Logo.svg/960px-ChatGPT-Logo.svg.png"
+            width="40"
+            height="40"
+            alt="ChatGPT Logo"
+            >
+        </div>
+        <span>ChatGPT</span>
+        </a>
+            <a href="https://mozahidreben.github.io/Diagram/" target="_blank" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-file-invoice"></i></div>
+                <span>Diagram</span>
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/1-CdkXlCfCRg_bBI2ti5ZMuDtwUYNdFsRD61D_nfbIt0/edit?gid=1589708902#gid=1589708902" target="_blank" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-tasks"></i></div>
+                <span>March Stations Stock & Sales</span>
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/1RCrLDIluGx5xbzLJGHAJMD7qME-Ko7eCcsrsrVgGsYA/edit?usp=sharing" target="_blank" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-clock"></i></div>
+                <span>Station Maintenance</span>
+            </a>
+        </div>
+
+        <div class="grid-row">
+            <a href="https://docs.google.com/spreadsheets/d/1NXEpjsrDw0aBP5eUcLUZsgYnLszYAfhtlRUptr5vUxQ/edit?usp=sharing" target="_blank" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-users"></i></div>
+                <span>April Station Stock</span>
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/1OKwRH1qcVH2_OQPFQFhBWgqNKAd2CQssfsQkaZQASW8/edit?usp=sharing" target="_blank" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-wallet"></i></div>
+                <span>May Stocks & Sales</span>
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/1YKroAeDj63sM1H8vFbFViPBCedTlw4scMJNnRVVPcwk/edit?usp=sharing" target="_blank" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-comment-dots"></i></div>
+                <span>Complaint Records</span>
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/1fNfvTbZhIRIvBFbP3i9T8pmsxbc3fvQ9uVEtkSZ_JO8/edit?usp=sharing" target="_blank" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-truck-moving"></i></div>
+                <span>New Reben App Sales</span>
+            </a>
+        </div>
+
+         <div class="grid-row">
+            <a href="https://docs.google.com/spreadsheets/d/1ORQEPCRdgX70VPxF6H1qgNVYs5OI2deGGnIt5oI9Q1c/edit?usp=sharing" target="_blank" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-users"></i></div>
+                <span>June Stocks</span>
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/18_ol60GUDO1IzWfck_pWsCGFaq9dW1_tjT8BReRsvzc/edit?gid=1589708902#gid=1589708902" target="_blank" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-wallet"></i></div>
+                <span>July Stocks</span>
+            </a>
+            <a href="#" target="_blank" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-comment-dots"></i></div>
+                <span>Pending 3</span>
+            </a>
+            <a href="https://mozahidreben.github.io/Hasad/" target="_blank" class="card vibrate-and-play-link">
+                <div class="card-icon-box"><i class="fas fa-kiwi-bird"></i></div>
+                <span>Hasad</span>
+            </a>
+        </div>
+    </div> 
+    
+    <div class="data-entry-container">
+        <div class="data-entry-top">
+            <div class="input-group">
+                <label>SELECT REGION</label>
+                <select id="region-select" class="custom-select border-red">
+                    <option value="" selected>All Regions / Clear</option>
+                    <option value="Central">Central</option>
+                    <option value="East">East</option>
+                    <option value="West">West</option>
+                    <option value="North">North</option>
+                    <option value="South">South</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label>SELECT ITEM</label>
+                <input id="station-input" list="station-options" class="custom-select border-grey" placeholder="Type or Select Item...">
+                <datalist id="station-options"></datalist>
+            </div>
+            
+            <div class="input-group">
+                <label>CATEGORY</label>
+                <input id="category-input" list="category-options" class="custom-select border-grey" placeholder="Type or Select Category...">
+                <datalist id="category-options">
+                    <option value="Maintenance">
+                    <option value="Sale">
+                    <option value="Trip">
+                    <option value="Details">
+                    <option value="Count"></option>
+                    <option value="Category 3">
+                </datalist>
+            </div>
+            
+            <div class="input-group">
+                <label>UPLOAD DATA</label>
+                <a href="YOUR_GOOGLE_FORM_LINK_HERE" target="_blank" class="custom-btn border-red vibrate-and-play-link">
+                    Enter Data Carefully
+                </a>
+            </div>
+        </div>
+        
+        <button class="search-db-btn vibrate-and-play-link">
+            <i class="fas fa-search"></i> Search Database Records
+        </button>
+    </div>
+
+    <div class="contact-section">
+        <div class="contact-card">
+            <div class="contact-visual">
+                <h3>Get in Touch</h3>
+                <p>We are online 24/7 to support your operations.</p>
+            </div>
+            <div class="contact-links">
+                <a href="tel:+966573008727" class="c-item vibrate-and-play-link">
+                    <div class="c-icon"><i class="fas fa-phone-alt"></i></div>
+                    <div class="c-detail">
+                        <h4>Call Support</h4>
+                        <div>+966 (573) 00-8727</div>
+                    </div>
+                </a>
+                
+                <a href="mailto:reben@msaken-almejdl.com" class="c-item vibrate-and-play-link">
+                    <div class="c-icon"><i class="fas fa-envelope"></i></div>
+                    <div class="c-detail">
+                        <h4>Email Us</h4>
+                        <div>reben@msaken.com</div>
+                    </div>
+                </a>
+                
+                <a href="#" class="c-item vibrate-and-play-link">
+                    <div class="c-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="c-detail">
+                        <h4>Visit HQ</h4>
+                        <div>Dirab Road, Riyadh</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-downloads">
+        <a href="https://play.google.com/store/apps/details?id=com.techsoft.bob.reben_worker" target="_blank" class="vibrate-and-play-link">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play">
+        </a>
+        <a href="https://apps.apple.com/app/464298168" target="_blank" class="vibrate-and-play-link">
+            <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="App Store">
+        </a>
+    </div>
+
+    <div class="whatsapp-container">
+        <div class="whatsapp-label">Chat with us!</div>
+        <div class="whatsapp-badge"></div>
+        <a href="https://wa.me/+966573008727?text=Assalamu Alaikum" target="_blank" class="whatsapp-float vibrate-and-play-link">
+            <i class="fab fa-whatsapp"></i>
+            <div class="particles-container"></div>
+        </a>
+    </div>
+
+    <div class="modal-overlay" id="resultsModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeModal"><i class="fas fa-times"></i></button>
+            <div class="modal-header">
+                <h4>Designed By- Mozahid</h4>
+            </div>
+            <div class="modal-body" id="modalBody">
+                </div>
+            <div class="modal-navigation-buttons" id="modalNavButtons">
+                <button class="nav-arrow" id="dynamicArrowBtn" title="Scroll to opposite end"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="pdf-container" style="display:none;"></div>
+
+    <footer class="accent-border">
+        <p>© 2026 Reben Company. All Rights Reserved.</p>
+        <p style="font-size: 0.8rem; margin-top: 5px;">
+  <a href="#" target="_blank" style="text-decoration:none; color:inherit; display:inline-flex; align-items:center;">
+    Designed by Mozahid
+    <i class="fas fa-arrow-up-right-from-square" style="margin-left:6px; font-size:10px;"></i>
+  </a>
+</p>
+    </footer>
+
+    <script>
+        /* =========================================
+           SECURITY NOTICE:
+           - Fetching data securely from Google Apps Script Web App.
+           - Ensure your Apps Script deployment is set to "Execute as: Me"
+             and "Who has access: Anyone".
+           - No sensitive data is ever written from this client.
+        ========================================= */
+
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // --- 0. DYNAMIC GOOGLE SHEET TICKER LOGIC (MULTIPLE LINKS CONSTANT SPEED) ---
+            const TICKER_WEB_APP_URLS = [
+                "https://script.google.com/macros/s/AKfycbyJHgVMUdXFu0ycjF5umernPUk4U0sryWGSj0oXMcoKebkzSgSzm1gJP8XpRpt_WZZ58Q/exec",
+                // ADD MORE WEB APP LINKS HERE LIKE THIS:
+                // "YOUR_SECOND_LINK_HERE",
+                // "YOUR_THIRD_LINK_HERE"
+            ];
+
+            function fetchTickerUpdates() {
+                if (!TICKER_WEB_APP_URLS || TICKER_WEB_APP_URLS.length === 0) return;
+
+                const fetchPromises = TICKER_WEB_APP_URLS.map(url => 
+                    fetch(url)
+                        .then(res => res.json())
+                        .catch(err => {
+                            console.error("Failed to load ticker data from a URL:", err);
+                            return []; 
+                        })
+                );
+
+                Promise.all(fetchPromises)
+                    .then(resultsArray => {
+                        let combinedData = [];
+                        
+                        resultsArray.forEach(data => {
+                            if (Array.isArray(data)) {
+                                combinedData = combinedData.concat(data);
+                            }
+                        });
+
+                        const tickerContent = document.getElementById('ticker-content');
+                        if (tickerContent && Array.isArray(combinedData) && combinedData.length > 0) {
+                            tickerContent.innerHTML = ''; // Clear default HTML
+                            
+                            // Adding greeting text
+                            const defaultMsgDiv = document.createElement('div');
+                            defaultMsgDiv.className = 'ticker-item';
+                            defaultMsgDiv.innerHTML = `<i class="fas fa-bolt"></i> Welcome to Reben-Live Updates.`;
+                            tickerContent.appendChild(defaultMsgDiv);
+                            
+                            const icons = ['fa-info-circle', 'fa-exclamation-circle', 'fa-bell'];
+                            
+                            combinedData.forEach((row, index) => {
+                                let msg = "";
+                                if (typeof row === 'string') {
+                                    msg = row;
+                                } else if (Array.isArray(row)) {
+                                    msg = row.filter(val => val !== null && val !== "").join(" - ");
+                                } else if (typeof row === 'object') {
+                                    msg = Object.values(row).filter(val => val !== null && val !== "").join(" - ");
+                                }
+
+                                if(msg && msg.trim() !== "") {
+                                    const icon = icons[index % icons.length];
+                                    const itemDiv = document.createElement('div');
+                                    itemDiv.className = 'ticker-item';
+                                    itemDiv.innerHTML = `<i class="fas ${icon}"></i> ${msg}`;
+                                    tickerContent.appendChild(itemDiv);
+                                }
+                            });
+
+                            // Duplicate content for a seamless loop
+                            const originalItems = tickerContent.innerHTML;
+                            tickerContent.innerHTML += originalItems; 
+
+                            // Calculate Duration for Constant Speed
+                            // Aiming for ~80 pixels per second
+                            const scrollWidth = tickerContent.scrollWidth / 2;
+                            const speed = 80; 
+                            const duration = scrollWidth / speed;
+
+                            // Apply dynamic duration to the animation
+                            tickerContent.style.animationDuration = duration + "s";
+                        }
+                    })
+                    .catch(err => console.error("Failed to process ticker data:", err));
+            }
+            
+            // Initiate Ticker Data Fetch
+            fetchTickerUpdates();
+
+            // --- 1. Audio & Vibration Logic ---
+            const backgroundMusic = document.getElementById('backgroundMusic');
+            let musicStarted = false;
+
+            function playMedia() {
+                if ("vibrate" in navigator) navigator.vibrate(50);
+                if (!musicStarted && backgroundMusic) {
+                    backgroundMusic.volume = 0.3;
+                    backgroundMusic.play().then(() => { musicStarted = true; }).catch(() => {});
+                }
+            }
+
+            document.querySelectorAll('.vibrate-and-play-link').forEach(el => {
+                el.addEventListener('click', playMedia);
+            });
+            document.body.addEventListener('click', playMedia, { once: true });
+
+
+            // --- 2. Reliable Synchronous Scrolling Logic (Mobile) ---
+            const rows = document.querySelectorAll('.grid-row');
+            let isSyncing = false;
+            let syncTimeout;
+
+            if (rows.length > 0) {
+                rows.forEach(row => {
+                    row.addEventListener('scroll', function() {
+                        if (window.innerWidth >= 769) return;
+                        if (isSyncing) return;
+
+                        isSyncing = true;
+                        const currentScrollLeft = this.scrollLeft;
+
+                        rows.forEach(otherRow => {
+                            if (otherRow !== this) {
+                                otherRow.scrollLeft = currentScrollLeft;
+                            }
+                        });
+
+                        clearTimeout(syncTimeout);
+                        syncTimeout = setTimeout(() => {
+                            isSyncing = false;
+                        }, 20); 
+                    }, { passive: true });
+                });
+            }
+
+
+            // --- 3. Slider Logic ---
+            const slides = document.querySelectorAll(".slide");
+            const dots = document.querySelectorAll(".dot");
+            let index = 0;
+            let slideInterval;
+
+            function showSlide(i) {
+                if (slides.length === 0) return;
+                i = i % slides.length;
+                if (i < 0) i = slides.length - 1;
+
+                slides.forEach(s => s.classList.remove("active"));
+                dots.forEach(d => d.classList.remove("active"));
+                slides[i].classList.add("active");
+                dots[i].classList.add("active");
+                index = i;
+            }
+
+            function nextSlide() {
+                showSlide(index + 1);
+            }
+
+            function startAuto() { slideInterval = setInterval(nextSlide, 5000); }
+            function stopAuto() { clearInterval(slideInterval); }
+
+            dots.forEach(dot => {
+                dot.addEventListener("click", () => {
+                    showSlide(parseInt(dot.dataset.index));
+                    stopAuto();
+                    startAuto();
+                });
+            });
+
+            if (slides.length > 0) {
+                showSlide(0);
+                startAuto();
+            }
+
+            // --- 4. Region to Dynamic Station Selection Logic (UPDATED STATION LISTS) ---
+            const regionStations = {
+                "Central": [
+                    "Truck", "Hurmila", "1-Mar-2026", "Tharmada", "ALL", "Hota 01", "Dariya", "Dawadmi Nora", "Bisha",
+                    "AL Kharaj", "AL Dar Baidah", "Aziziyah", "Bilal", "Badar", "Hota 02", "Khouf",
+                    "Damam Road", "Shediyah", "AL Reen", "Muhamadiya SHQ Rd", "Hanish", "Sagir 01",
+                    "Dharat laban", "Dilam", "Auj Shola", "AL Rass", "Dhurmah", "AL Ruweda",
+                    "Dawasir 02", "Dawasir 01", "Shawaiyah", "Khashra", "Tayri"
+                ],
+                "East": [
+                    "AL - Hasa 04", "AL - Hasa 05", "AL - Hasa 09", "Hafar AL Batin", "AL - Hasa 08",
+                    "AL - Hasa 10", "AL - Hasa 03", "AL - Hasa 07", "HASA 11 DHRN FSL", "Qaisumah"
+                ],
+                "West": [
+                    "REDWAN", "Yary", "Jeddah Rahmaniya", "Taif", "Ardiyah"
+                ],
+                "North": [
+                    "Rafha", "Domat", "AL Jouf", "Auqlia 01", "Auqlia 02", "Auqlia 03", "Arar"
+                ],
+                "South": [
+                    "Dharan AL Junub 2", "Thagar", "Nimra", "Shorora 02", "Najran 04", "Najran 03",
+                    "Najran 01", "Najran 02", "Najran 05", "Najran 06", "Najran 07", "Najran 08",
+                    "Naj-Sharf Markab", "Jizan Daheka",
+                    "ASHOK", "MUTAKIRU", "ABDULAI", "SALMAN", "KAMLESH", "AFROJ", "RASHID AMIDU",
+                    "PHEKAN YADAV", "PRADIP RAMTEL", "AITARAM TAMANG", "ATIF", "KRISHNA TAMANG",
+                    "MOHIN IRFAN", "ARUN THARU", "ABDUL MUTLIB", "SANJAY THARU", "FARMAN ALI",
+                    "SUHAIL KHAN", "MUSHAHID MALVA", "VIM Narayan", "SURINDRA MAHTO", "CHANDRA BAHADUR",
+                    "SADDAM", "BUDDA", "MOHAMMAD WASIM", "TIJANI MUSAH", "JIBRIL", "SUBHASH",
+                    "ABDULAI A RAHMAN", "FAISAL", "ISSAKA ABUBAKARI", "SAGAR RAM", "MAYAKYE",
+                    "GANESH LAMA", "SELMAN TAMANG", "FAROOQ", "MD. ALAM", "WASIM", "FAIZAN", "GULFAM",
+                    "IRFAN YAMEEN", "JISHAN IQBAL", "JISHAN MUSTAFA", "JUBAIR", "MAJID", "NAJIM",
+                    "SHAHE AALAM", "WASIM YUSUF", "HARIS", "JITENDRA", "MOHSIN", "NADEEM", "VAKEEL",
+                    "ALAY", "FURKAN", "NAUSHAD", "SHAHID", "WAJID", "ATIK", "JAMEEL", "ASIF", "SACHIN",
+                    "BABA ABUBAKARI"
+                ]
+            };
+
+            const regionSelect = document.getElementById('region-select');
+            const stationInput = document.getElementById('station-input');
+            const stationOptions = document.getElementById('station-options');
+            const categoryInput = document.getElementById('category-input');
+
+            if (regionSelect && stationInput && stationOptions) {
+                
+                const populateAllStations = () => {
+                    stationOptions.innerHTML = '';
+                    Object.values(regionStations).flat().forEach(station => {
+                        const option = document.createElement('option');
+                        option.value = station;
+                        stationOptions.appendChild(option);
+                    });
+                };
+                
+                populateAllStations();
+
+                regionSelect.addEventListener('change', function() {
+                    const selectedRegion = this.value;
+                    stationOptions.innerHTML = ''; 
+
+                    if (selectedRegion && regionStations[selectedRegion]) {
+                        regionStations[selectedRegion].forEach(station => {
+                            const option = document.createElement('option');
+                            option.value = station;
+                            stationOptions.appendChild(option);
+                        });
+                    } else {
+                        populateAllStations();
+                    }
+                });
+            }
+
+            // --- 5. GOOGLE SHEETS DATABASE SEARCH & ORDER RENDERING ---
+            
+            let globalDataCache = [];
+            let isDataReady = false;
+
+            const WEB_APP_URLS = [
+                "https://script.google.com/macros/s/AKfycbzYfDA37mAH6baNnFaHvzzSap3xpxMmAA9fLn1fTV9qIVTdcllng4WrEvL1ybXQw8RKmw/exec",
+                "https://script.google.com/macros/s/AKfycbzPwWK4IcFhoDvOdWKlFWkpjCRGC7AEmVxwCzFbq8XF7ilbom1rVLzz_gfcjVyUXPuG/exec"
+            ];
+
+            function fetchGoogleSheetData() {
+                const searchBtnElem = document.querySelector('.search-db-btn');
+                if (searchBtnElem) searchBtnElem.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing Live Data...';
+
+                const fetchPromises = WEB_APP_URLS.map(url => fetch(url).then(response => response.json()));
+
+                Promise.all(fetchPromises)
+                    .then(resultsArray => {
+                        let combinedData = [];
+                        let hasError = false;
+
+                        resultsArray.forEach(data => {
+                            if (data.error) {
+                                console.error("Apps Script Error:", data.error);
+                                hasError = true;
+                            } else if (Array.isArray(data)) {
+                                combinedData = combinedData.concat(data);
+                            }
+                        });
+
+                        if (hasError && combinedData.length === 0) {
+                            if (searchBtnElem) searchBtnElem.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Sync Error';
+                            return;
+                        }
+
+                        globalDataCache = combinedData;
+                        isDataReady = true;
+                        if (searchBtnElem) searchBtnElem.innerHTML = '<i class="fas fa-search"></i> Search Database Records';
+                    })
+                    .catch(err => {
+                        console.error("Fetch error:", err);
+                        if (searchBtnElem) searchBtnElem.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Offline / Error';
+                    });
+            }
+
+            fetchGoogleSheetData();
+            
+            const searchBtn = document.querySelector('.search-db-btn');
+            const modalOverlay = document.getElementById('resultsModal');
+            const closeModal = document.getElementById('closeModal');
+            const modalBody = document.getElementById('modalBody');
+            const modalContentElem = document.querySelector('#resultsModal .modal-content');
+            const navButtons = document.getElementById('modalNavButtons');
+            const dynamicArrowBtn = document.getElementById('dynamicArrowBtn');
+
+            function toggleArrowVisibility() {
+                if (!modalContentElem || !navButtons) return;
+                const isOverflowing = modalContentElem.scrollHeight > modalContentElem.clientHeight;
+                if (isOverflowing) {
+                    navButtons.classList.add('visible');
+                } else {
+                    navButtons.classList.remove('visible');
+                }
+            }
+
+            function updateArrowDirection() {
+                if (!modalContentElem || !dynamicArrowBtn) return;
+                const scrollTop = modalContentElem.scrollTop;
+                const maxScroll = modalContentElem.scrollHeight - modalContentElem.clientHeight;
+                const isAtBottom = maxScroll - scrollTop <= 5;
+                if (isAtBottom) {
+                    dynamicArrowBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+                    dynamicArrowBtn.title = "Go to top";
+                } else {
+                    dynamicArrowBtn.innerHTML = '<i class="fas fa-arrow-down"></i>';
+                    dynamicArrowBtn.title = "Go to bottom";
+                }
+            }
+
+            if (modalContentElem) {
+                modalContentElem.addEventListener('scroll', () => {
+                    updateArrowDirection();
+                });
+            }
+
+            if (searchBtn && regionSelect && stationInput && categoryInput) {
+                searchBtn.addEventListener('click', () => {
+                    const regionRaw = regionSelect.value;
+                    const stationRaw = stationInput.value.trim();
+                    const categoryRaw = categoryInput.value.trim();
+                    
+                    const region = regionRaw && regionRaw !== "" ? regionRaw : null;
+                    const station = stationRaw && stationRaw !== "" ? stationRaw : null;
+                    const category = categoryRaw && categoryRaw !== "" ? categoryRaw : null;
+
+                    if (!region && !station && !category) {
+                        alert("Please provide at least one search criteria (Region, Item, or Category).");
+                        return;
+                    }
+
+                    modalOverlay.classList.add('active');
+                    if (navButtons) navButtons.classList.remove('visible');
+
+                    if (!isDataReady) {
+                        modalBody.innerHTML = '<div class="loader"></div><p style="text-align:center;">Downloading database for the first time, please wait...</p>';
+                        const checkInterval = setInterval(() => {
+                            if (isDataReady) {
+                                clearInterval(checkInterval);
+                                executeSearch();
+                            }
+                        }, 500);
+                        return;
+                    }
+
+                    executeSearch();
+
+                    function executeSearch() {
+                        modalBody.innerHTML = '';
+                        let combinedData = globalDataCache;
+
+                        if (combinedData.length === 0) {
+                            modalBody.innerHTML = '<p style="text-align:center; color: #64748b;">No records found in database.</p>';
+                            toggleArrowVisibility();
+                            return;
+                        }
+
+                        combinedData = combinedData.filter(item => {
+                            const searchRegion = region ? region.toLowerCase().trim() : null;
+                            const searchItem = station ? station.toLowerCase().trim() : null;
+                            const searchCategory = category ? category.toLowerCase().trim() : null;
+
+                            if (!searchRegion && !searchCategory && searchItem) {
+                                return Object.values(item).some(val => 
+                                    val !== null && val !== undefined && String(val).toLowerCase().includes(searchItem)
+                                );
+                            }
+
+                            const myOrder = item["_column_order"];
+                            if (!myOrder || myOrder.length < 3) return false;
+
+                            const offset = (myOrder[0] === "Source_Tab") ? 1 : 0;
+                            const colA_Header = myOrder[offset + 0];
+                            const colB_Header = myOrder[offset + 1];
+                            const colC_Header = myOrder[offset + 2];
+
+                            const valA = String(item[colA_Header] || "").toLowerCase().trim();
+                            const valB = String(item[colB_Header] || "").toLowerCase().trim();
+                            const valC = String(item[colC_Header] || "").toLowerCase().trim();
+
+                            const matchRegion = !searchRegion || (valA === searchRegion);
+                            const matchItem = !searchItem || (valB === searchItem);
+                            const matchCategory = !searchCategory || (valC === searchCategory);
+
+                            return matchRegion && matchItem && matchCategory;
+                        });
+
+                        if (combinedData.length === 0) {
+                            modalBody.innerHTML = '<p style="text-align:center; color: #64748b;">No matching records found for this combination.</p>';
+                        } else {
+                            combinedData.forEach(item => {
+                                const div = document.createElement('div');
+                                div.className = 'result-item';
+                                let content = '';
+                                
+                                if (item["Source_Tab"]) {
+                                    content += `<span class="source-tab-label">${item["Source_Tab"]}</span>`;
+                                }
+
+                                const activeOrder = item["_column_order"];
+                                if (activeOrder && activeOrder.length > 0) {
+                                    activeOrder.forEach(headerName => {
+                                        if (headerName === "_column_order" || headerName === "Source_Tab") return;
+                                        const value = item[headerName];
+                                        if (value !== null && value !== undefined && String(value).trim() !== "") {
+                                            content += `<p><strong>${headerName}:</strong> ${value}</p>`;
+                                        }
+                                    });
+                                } else {
+                                    for (const [key, value] of Object.entries(item)) {
+                                        if (key === "_column_order" || key === "Source_Tab") continue;
+                                        if (value !== null && value !== undefined && String(value).trim() !== "") {
+                                            content += `<p><strong>${key}:</strong> ${value}</p>`;
+                                        }
+                                    }
+                                }
+
+                                div.innerHTML = content;
+                                modalBody.appendChild(div);
+                            });
+
+                            const actionBtnsContainer = document.createElement('div');
+                            actionBtnsContainer.className = 'modal-action-btns';
+                            actionBtnsContainer.innerHTML = `
+                                <button id="btn-print" title="Print Data" class="action-icon-btn"><i class="fas fa-print"></i></button>
+                                <span style="display: flex; align-items: center; font-weight: 600; font-size: 1rem; color: var(--text-main); margin-right: auto; margin-left: 5px;">Total: ${combinedData.length}</span>
+                                <button id="btn-excel" title="Download Excel" class="action-icon-btn"><i class="fas fa-file-excel"></i></button>
+                                <button id="btn-pdf" title="Download PDF" class="action-icon-btn"><i class="fas fa-file-pdf"></i></button>
+                                <button id="btn-wa-share" title="Share on WhatsApp" class="action-icon-btn wa-btn"><i class="fab fa-whatsapp"></i></button>
+                            `;
+                            modalBody.appendChild(actionBtnsContainer);
+
+                            document.getElementById('btn-print').addEventListener('click', () => { window.print(); });
+                            document.getElementById('btn-excel').addEventListener('click', () => {
+                                if(typeof XLSX !== 'undefined') {
+                                    const exportData = combinedData.map(obj => {
+                                        const clean = {...obj};
+                                        delete clean._column_order;
+                                        return clean;
+                                    });
+                                    const ws = XLSX.utils.json_to_sheet(exportData);
+                                    const wb = XLSX.utils.book_new();
+                                    XLSX.utils.book_append_sheet(wb, ws, "Reben Data");
+                                    XLSX.writeFile(wb, "Reben_Database_Export.xlsx");
+                                } else {
+                                    alert("Excel generator is loading...");
+                                }
+                            });
+                            document.getElementById('btn-pdf').addEventListener('click', () => {
+                                if(typeof html2pdf !== 'undefined') {
+                                    const resultsHTML = modalBody.innerHTML;
+                                    const printWrapper = document.createElement('div');
+                                    printWrapper.style.padding = '40px';
+                                    printWrapper.style.background = 'white';
+                                    printWrapper.style.width = '750px'; 
+                                    printWrapper.innerHTML = `
+                                        <div style="text-align:center; border-bottom: 2px solid #ff0f39; padding-bottom: 20px; margin-bottom: 30px;">
+                                            <h1 style="color:#ff0f39; margin:0; font-size: 28px;">REBEN COMPANY</h1>
+                                            <h2 style="color:#1e293b; margin: 10px 0 0 0; font-size: 20px;">Database Search Report</h2>
+                                            <p style="color:#64748b; margin: 5px 0 0 0;">Date: ${new Date().toLocaleString()}</p>
+                                        </div>
+                                        <div style="font-family: 'Outfit', sans-serif;">
+                                            ${resultsHTML}
+                                        </div>
+                                        <div style="margin-top: 40px; text-align: center; color: #94a3b8; font-size: 11px;">
+                                            © 2026 Reben Petroleum | Designed By - Mozahid
+                                        </div>
+                                    `;
+                                    const btnToRemove = printWrapper.querySelector('.modal-action-btns');
+                                    if(btnToRemove) btnToRemove.remove();
+                                    const opt = {
+                                        margin: 10,
+                                        filename: 'Reben_Report.pdf',
+                                        image: { type: 'jpeg', quality: 0.98 },
+                                        html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+                                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                                    };
+                                    html2pdf().set(opt).from(printWrapper).save();
+                                } else {
+                                    alert("PDF tool is still loading...");
+                                }
+                            });
+                            document.getElementById('btn-wa-share').addEventListener('click', () => {
+                                let textToShare = "Reben Database Result:\n\n";
+                                combinedData.forEach((item, index) => {
+                                    textToShare += `Record ${index + 1}:\n`;
+                                    if (item["Source_Tab"]) textToShare += `SOURCE: ${item["Source_Tab"]}\n`;
+                                    const activeOrder = item["_column_order"];
+                                    if (activeOrder && activeOrder.length > 0) {
+                                        activeOrder.forEach(headerName => {
+                                            if (headerName === "_column_order" || headerName === "Source_Tab") return;
+                                            const val = item[headerName];
+                                            if (val) textToShare += `${headerName}: ${val}\n`;
+                                        });
+                                    } else {
+                                        for(const [key, value] of Object.entries(item)) {
+                                            if (key === "_column_order" || key === "Source_Tab") continue;
+                                            if (value) textToShare += `${key}: ${value}\n`;
+                                        }
+                                    }
+                                    textToShare += "\n";
+                                });
+                                window.open(`https://wa.me/?text=${encodeURIComponent(textToShare)}`, '_blank');
+                            });
+                        }
+
+                        setTimeout(() => {
+                            toggleArrowVisibility();
+                            updateArrowDirection();
+                        }, 50);
+                    }
+                });
+            }
+
+            closeModal.addEventListener('click', () => { modalOverlay.classList.remove('active'); });
+            modalOverlay.addEventListener('click', (e) => { 
+                if (e.target === modalOverlay) modalOverlay.classList.remove('active'); 
+            });
+
+            if (dynamicArrowBtn && modalContentElem) {
+                dynamicArrowBtn.addEventListener('click', () => {
+                    const scrollTop = modalContentElem.scrollTop;
+                    const maxScroll = modalContentElem.scrollHeight - modalContentElem.clientHeight;
+                    const isAtBottom = maxScroll - scrollTop <= 5;
+                    if (isAtBottom) {
+                        modalContentElem.scrollTo({ top: 0, behavior: 'smooth' });
+                    } else {
+                        modalContentElem.scrollTo({ top: modalContentElem.scrollHeight, behavior: 'smooth' });
+                    }
+                });
+            }
+
+            if (modalBody && modalContentElem) {
+                const observer = new MutationObserver(() => {
+                    toggleArrowVisibility();
+                    updateArrowDirection();
+                });
+                observer.observe(modalBody, { childList: true, subtree: true, characterData: true });
+            }
+        });
+    </script>
+</body>
+</html>
